@@ -1,0 +1,94 @@
+{
+  "name": "worktree-colors",
+  "displayName": "Worktree Colors",
+  "description": "Gives every git worktree its own OKLCH-based window border / title bar color without touching the repo's .vscode folder.",
+  "version": "0.5.0",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Other"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      { "command": "worktreeColors.reroll", "title": "Worktree Colors: Re-roll Color" },
+      { "command": "worktreeColors.reset", "title": "Worktree Colors: Reset to Default Color" },
+      { "command": "worktreeColors.show", "title": "Worktree Colors: Show Current Color" },
+      { "command": "worktreeColors.clear", "title": "Worktree Colors: Remove Colors From This Window" }
+    ],
+    "configuration": {
+      "title": "Worktree Colors",
+      "properties": {
+        "worktreeColors.lightness": {
+          "type": "number", "default": 0.5, "minimum": 0, "maximum": 1,
+          "scope": "application",
+          "markdownDescription": "OKLCH lightness (0–1) shared by all worktree colors. Text switches to black above `0.65`."
+        },
+        "worktreeColors.chromaMin": {
+          "type": "number", "default": 0.065, "minimum": 0, "maximum": 0.37,
+          "scope": "application",
+          "markdownDescription": "Lowest OKLCH chroma a worktree can get. Each worktree's chroma is picked from the hash between `chromaMin` and `chromaMax`."
+        },
+        "worktreeColors.chromaMax": {
+          "type": "number", "default": 0.085, "minimum": 0, "maximum": 0.37,
+          "scope": "application",
+          "markdownDescription": "Highest OKLCH chroma. At lightness `0.5`, up to about `0.085` fits in sRGB for every hue; above that, some hues are toned down to fit the screen."
+        },
+        "worktreeColors.hashSource": {
+          "type": "string", "enum": ["branch", "path"], "default": "branch",
+          "scope": "application",
+          "enumDescriptions": [
+            "Color follows the branch name: a re-created worktree for the same branch gets the same color. Falls back to the path when HEAD is detached.",
+            "Color follows the worktree's folder path."
+          ],
+          "description": "What the color is derived from."
+        },
+        "worktreeColors.targets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["border", "titleBar", "statusBar", "activityBar"],
+            "enumDescriptions": [
+              "Window border and sash hover border.",
+              "Title bar and command center.",
+              "Status bar (bottom), incl. hover, remote indicator and debugging state.",
+              "Activity bar (left, or top when moved there), incl. badges."
+            ]
+          },
+          "default": ["border", "titleBar"],
+          "scope": "application",
+          "description": "Which parts of the window get colored."
+        },
+        "worktreeColors.colorMainWorktree": {
+          "type": "boolean", "default": false,
+          "scope": "application",
+          "description": "Also color the main worktree (the original checkout), not just linked worktrees."
+        },
+        "worktreeColors.storage": {
+          "type": "string", "enum": ["workspaceFile", "folderSettings"], "default": "workspaceFile",
+          "scope": "application",
+          "enumDescriptions": [
+            "Reopen each worktree through a generated .code-workspace file kept in the extension's own storage. The repo's .vscode folder is never touched.",
+            "Write the colors to the worktree's .vscode/settings.json (only if that file is not shared)."
+          ],
+          "description": "Where the per-worktree colors are stored."
+        },
+        "worktreeColors.mirrorRepoSettings": {
+          "type": "boolean", "default": true,
+          "scope": "application",
+          "description": "Mirror the repo's shared .vscode/settings.json into the generated workspace file and keep it in sync, so window-level shared settings still apply."
+        },
+        "worktreeColors.replaceRepoColors": {
+          "type": "boolean", "default": true,
+          "scope": "application",
+          "markdownDescription": "Remove every color key this extension manages (for example leftovers from Peacock) from the repo's mirrored `workbench.colorCustomizations`, even for targets that aren't enabled. Other repo color customizations are kept."
+        },
+        "worktreeColors.autoReopen": {
+          "type": "boolean", "default": true,
+          "scope": "application",
+          "description": "When a worktree is opened as a plain folder, switch to its colored workspace automatically instead of asking."
+        }
+      }
+    }
+  }
+}
